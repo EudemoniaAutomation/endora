@@ -48,6 +48,8 @@
     .cta-primary:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 15px 60px rgba(74,144,226,.6)}
     .cta-secondary{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:transparent;color:var(--acc);font-weight:800;font-size:1rem;text-decoration:none;border:2px solid var(--acc);border-radius:50px;transition:.3s}
     .cta-secondary:hover{color:#000;transform:translateY(-3px);box-shadow:0 10px 40px rgba(74,144,226,.4);background:var(--acc)}
+    .cta-ghost{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:transparent;color:var(--acc);font-weight:800;font-size:1rem;text-decoration:none;border:1px dashed var(--acc);border-radius:50px;transition:.3s}
+    .cta-ghost:hover{transform:translateY(-3px);filter:brightness(1.15)}
 
     .demo-section{margin:60px 0;animation:fadeInUp 1.2s ease}
     .demo-card{background:linear-gradient(135deg,var(--card), rgba(74,144,226,.02));border:1px solid var(--card-border);border-radius:30px;padding:40px 30px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:relative;overflow:hidden;text-align:center}
@@ -136,42 +138,16 @@
     .feature-text{font-size:1.05rem;font-weight:500;color:#e2e8f0}
 
     /* PRICING */
-    .pricing-section{margin:100px 0}
-    .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:28px}
-    @media(max-width:960px){.price-grid{grid-template-columns:1fr}}
-    .price-card{
-      background:linear-gradient(135deg,var(--card), rgba(74,144,226,.02));
-      border:1px solid var(--card-border);
-      border-radius:20px; padding:22px;
-      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-      display:grid; grid-template-columns:1fr auto; gap:8px 16px; align-items:start;
-      box-shadow:0 12px 40px rgba(0,0,0,.35);
-    }
-    .price-title{font-weight:800;font-size:1.1rem}
-    .price-amount{font-weight:900;white-space:nowrap}
-    .price-desc{grid-column:1 / -1; color:#cbd5e1; font-size:.98rem; line-height:1.5}
-    .price-note{grid-column:1 / -1; color:#94a3b8; font-size:.85rem; margin-top:6px}
-    .pricing-cta{margin-top:22px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-    .pricing-cta a{white-space:nowrap}
+    .pricing{margin:90px auto 24px;max-width:1100px}
+    .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:22px}
+    .price-card{background:linear-gradient(135deg,var(--card), rgba(74,144,226,.02));border:1px solid var(--card-border);border-radius:16px;padding:20px 18px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    .price-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .price-title{font-weight:800}
+    .price-amount{font-weight:900}
+    .price-desc{color:#cbd5e1;font-size:.98rem;line-height:1.45}
 
-    .footer{background:linear-gradient(135deg,#0a0a0a,#1a1a1a);padding:36px 0;text-align:center;border-top:1px solid var(--card-border);margin-top:90px}
-    .footer-links{margin-top:16px}
-    .footer-links a{color:var(--muted);text-decoration:none;margin:0 14px;transition:color .3s ease}
-    .footer-links a:hover{color:var(--acc)}
-    .legal-line{ text-align:center; margin-top:12px; font-size:12px; color:var(--muted); }
-    .legal-line a{ color:var(--muted); text-decoration:none; }
-    .legal-line a:hover{ color:var(--acc); text-decoration:underline; }
-
-    @media (max-width:900px){.steps-grid{grid-template-columns:repeat(2,1fr)}}
-    @media (max-width:640px){
-      .hero h1{font-size:2.5rem}.hero-subtitle{font-size:1.1rem}
-      .steps-grid{grid-template-columns:1fr;gap:18px}
-      .section-title{font-size:2.1rem}
-      .container{padding:0 14px}
-      .demo-card{padding:26px 18px}
-      .chat-window{height:460px}
-      .qr-section{flex-direction:column;gap:18px}
-    }
+    /* Bottom CTA (restored original look) */
+    .bottom-cta{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin:28px 0}
   </style>
 </head>
 <body>
@@ -197,6 +173,7 @@
       <div class="cta-container">
         <a class="cta-primary" href="https://buy.stripe.com/dRmdRab5I2gycqN3nA0Jq00">Order Endora (with landing page)</a>
         <a class="cta-secondary" href="https://buy.stripe.com/aFaaEY0r4aN4cqN2jw0Jq01">Order Endora (without landing page)</a>
+        <a class="cta-ghost" href="mailto:info@eudemonia-coaching.de">Affiliate / partners / custom offers</a>
       </div>
     </section>
 
@@ -261,7 +238,7 @@
 
       <div class="features-grid">
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Plug &amp; play — ready in minutes</div></div>
-        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">White-label — runs in your branding</div></div>
+        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Runs in your branding</div></div>
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">GDPR-compliant, hosted in the EU</div></div>
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Additional revenue with no extra work</div></div>
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Franchise partner option</div></div>
@@ -270,49 +247,58 @@
     </section>
 
     <!-- PRICING -->
-    <section class="pricing-section" id="pricing">
+    <section class="pricing">
       <h2 class="section-title">Pricing</h2>
-      <p class="section-subtitle">Prices shown are VAT-exclusive where applicable.</p>
+      <p class="section-subtitle">Prices shown are VAT-exclusive where applicable</p>
 
-      <div class="price-grid">
-        <!-- Endora monthly FIRST -->
-        <div class="price-card">
-          <div class="price-title">Endora</div>
-          <div class="price-amount">€ 9.00 / month</div>
-          <div class="price-desc">
-            Your subscription to your digital concierge service — more revenue, less work, happier guests. <strong>Billed monthly.</strong>
+      <div class="pricing-grid">
+        <!-- Endora subscription FIRST -->
+        <article class="price-card">
+          <div class="price-head">
+            <div class="price-title">Endora</div>
+            <div class="price-amount">€ 9.00 / month</div>
           </div>
-        </div>
+          <p class="price-desc">
+            Your subscription to your digital concierge service — more revenue, less work, happier guests. Billed monthly.
+          </p>
+        </article>
 
-        <!-- Initial Setup with Landing Page -->
-        <div class="price-card">
-          <div class="price-title">Initial Setup with Landing Page</div>
-          <div class="price-amount">€ 250.00</div>
-          <div class="price-desc">
-            Creation of a landing page for Endora — <em>3x revisions included</em> · reachable via a Eudemonia URL · QR code creation · Endora integration · hosting of the page for as long as the Endora subscription is active.
+        <!-- Initial Setup WITH landing page -->
+        <article class="price-card">
+          <div class="price-head">
+            <div class="price-title">Initial Setup with Landing Page</div>
+            <div class="price-amount">€ 250.00</div>
           </div>
-          <div class="price-note">One-time fee.</div>
-        </div>
+          <p class="price-desc">
+            Creation of a landing page for Endora (3 revisions included · reachable via Eudemonia URL · creation of QR codes · integration of Endora · hosting of the page for as long as the Endora subscription is active).
+          </p>
+        </article>
 
-        <!-- Initial Setup without Landing Page -->
-        <div class="price-card">
-          <div class="price-title">Initial Setup without Landing Page</div>
-          <div class="price-amount">€ 90.00</div>
-          <div class="price-desc">
-            You use your own landing page for Endora — we provide the code snippet to open Endora and you embed it yourself (JSON/HTML skills required) · you provide the URL we store in our database for activation · we generate the QR code.
+        <!-- Initial Setup WITHOUT landing page -->
+        <article class="price-card">
+          <div class="price-head">
+            <div class="price-title">Initial Setup without Landing Page</div>
+            <div class="price-amount">€ 90.00</div>
           </div>
-          <div class="price-note">One-time fee.</div>
-        </div>
+          <p class="price-desc">
+            You use your own landing page for Endora. We provide the code snippet to reach Endora, which must be embedded by you (JSON/HTML skills required). You provide the URL that we store in our database for the chat link. Includes creation of QR codes.
+          </p>
+        </article>
       </div>
 
-      <div class="pricing-cta">
+      <!-- Contact for affiliates / partners -->
+      <div class="cta-container" style="margin-top:30px">
+        <a class="cta-ghost" href="mailto:info@eudemonia-coaching.de">Affiliate inquiries / service partners / custom offers</a>
+      </div>
+
+      <!-- Bottom CTAs (restored original look & text) -->
+      <div class="bottom-cta">
         <a class="cta-primary" href="https://buy.stripe.com/dRmdRab5I2gycqN3nA0Jq00">Order Endora (with landing page)</a>
         <a class="cta-secondary" href="https://buy.stripe.com/aFaaEY0r4aN4cqN2jw0Jq01">Order Endora (without landing page)</a>
-        <a class="cta-secondary" href="mailto:info@eudemonia-coaching.de">Affiliate / partners / custom offers</a>
       </div>
 
-      <div class="legal-line" style="margin-top:18px">
-        <a href="https://concierge.eudemonia-coaching.de/clients/legal" target="_blank" rel="noopener">Legal Notice | Privacy Policy | Terms &amp; Conditions</a>
+      <div class="legal-line" style="text-align:center">
+        <a href="https://eudemoniaautomation.github.io/endora/legal.html" target="_blank" rel="noopener">Legal Notice | Privacy Policy | Terms &amp; Conditions</a>
       </div>
     </section>
   </div>
@@ -359,7 +345,6 @@
       if (wrap) wrap.style.display = 'none';
       if (ovl)  ovl.style.display  = 'none';
 
-      // Typing / waiting animation
       function wireTyping(messagesId, inputAreaId, typingId){
         const messages  = document.getElementById(messagesId);
         const inputArea = document.getElementById(inputAreaId);
@@ -383,7 +368,6 @@
       wireTyping('inline-messages','inline-input-area','inline-typing');
       wireTyping('popup-messages','popup-input-area','popup-typing');
 
-      // Rewrite the very first welcome line to your exact copy
       const DESIRED = "Welcome! 👋 I'm Endora, your Digital Concierge. Ask me anything about your stay.";
       function safeRewrite(containerId){
         const container = document.getElementById(containerId);
@@ -403,7 +387,6 @@
       }
       safeRewrite('inline-messages'); safeRewrite('popup-messages');
 
-      // QR opens popup (doesn't navigate)
       const qr = document.getElementById('apt-qr');
       qr?.addEventListener('click', (e)=>{
         e.preventDefault();
@@ -411,7 +394,6 @@
         if (wrap) wrap.style.display = 'block';
       });
 
-      // Generate QR for this page (for mobile handoff)
       (function setQr(){
         const target = location.origin + location.pathname;
         const src = 'https://quickchart.io/qr?text=' + encodeURIComponent(target) +
@@ -425,9 +407,9 @@
     })();
   </script>
 
-  <!-- Coreloader from OLD working repo (absolute URL so this single-site repo works) -->
+  <!-- Coreloader (exact page URL auto-sent; no auto-open) -->
   <script
-    src="https://eudemoniaautomation.github.io/chat-interface-tech-config/v1/coreloader.js"
+    src="/chat-interface-tech-config/v1/coreloader.js"
     data-webhook="https://automation.eudemonia-coaching.de/webhook/477363f3-7434-4c31-92e5-fb4da3db4150"
     data-brand="Endora — Digital Concierge"
     data-start-open="false">
