@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Endora · Legal Notice, Privacy Policy & GTC</title>
+  <meta name="description" content="Endora Hospitality Concierge — Legal Notice, Privacy Policy & General Terms and Conditions (GTC)">
+  <style>
+    /* ---- Base ---- */
+    *{box-sizing:border-box;margin:0}
+    :root{
+      --bg:#000000; --ink:#ffffff; --muted:#94a3b8;
+      --acc:#4A90E2; --acc-glow:#6BA3F5; --acc-dark:#2E5C8A;
+      --card:rgba(18,18,18,.88); --border:rgba(74,144,226,.20);
+      --radius:20px; --pad:22px; --max:980px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    html,body{height:100%}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+      background:var(--bg); color:var(--ink); line-height:1.5;
+      -webkit-font-smoothing:antialiased; overflow-x:hidden;
+    }
+    /* Subtle neon wall */
+    body::before{
+      content:""; position:fixed; inset:-20%;
+      background:
+        radial-gradient(800px 400px at 20% 10%, rgba(75,144,226,.18), transparent 60%),
+        radial-gradient(600px 300px at 80% 90%, rgba(107,163,245,.14), transparent 60%);
+      filter:saturate(120%) blur(2px); z-index:-1;
+    }
+    a{color:var(--acc); text-decoration:none}
+    a:hover{color:var(--acc-glow); text-decoration:underline}
+    /* ---- Layout ---- */
+    .wrap{max-width:var(--max); margin:40px auto; padding:0 16px}
+    .header{
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      margin-bottom:24px; padding:12px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px; user-select:none;
+    }
+    .logo{
+      width:40px; height:40px; border-radius:12px;
+      background:linear-gradient(135deg, var(--acc), var(--acc-glow));
+      box-shadow:0 6px 20px rgba(74,144,226,.35);
+    }
+    .brand h1{font-size:18px; letter-spacing:.4px}
+    .pill{
+      font-size:12px; padding:6px 10px; border-radius:999px; color:#cde3ff;
+      border:1px solid var(--border); background:rgba(255,255,255,.03)
+    }
+    nav{display:flex; gap:10px; flex-wrap:wrap}
+    nav a{font-size:13px; padding:6px 10px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,.03)}
+    /* ---- Cards ---- */
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:var(--pad); margin:16px 0;
+      backdrop-filter:blur(6px);
+    }
+    .card h2{font-size:20px; margin-bottom:8px}
+    .muted{color:var(--muted); font-size:14px}
+    .kvs{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
+    .kv{font-size:12px; border:1px dashed var(--border); padding:4px 8px; border-radius:8px; color:#cfe2ff}
+    /* ---- Accordion ---- */
+    .acc{border-radius:16px; overflow:hidden; border:1px solid var(--border); margin:14px 0}
+    .acc .i{border-top:1px solid var(--border)}
+    .acc .i:first-child{border-top:0}
+    .acc summary{
+      list-style:none; cursor:pointer; padding:16px 18px; background:rgba(255,255,255,.02);
+      font-weight:600; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .acc summary::-webkit-details-marker{display:none}
+    .acc .chev{transition:transform .25s ease; opacity:.9}
+    details[open] .chev{transform:rotate(90deg)}
+    .acc .content{padding:16px 18px; background:rgba(0,0,0,.25)}
+    h3{margin:12px 0 6px; font-size:16px}
+    ul{padding-left:18px; margin:6px 0}
+    li{margin:4px 0}
+    .foot{
+      display:flex; gap:12px; flex-wrap:wrap; margin-top:16px
+    }
+    .btn{
+      display:inline-block; padding:10px 14px; border-radius:12px; font-weight:600;
+      border:1px solid var(--border); background:rgba(255,255,255,.03)
+    }
+    .btn.primary{
+      background:linear-gradient(135deg, var(--acc-dark), var(--acc));
+      border-color:transparent; color:#fff; box-shadow:0 8px 24px rgba(74,144,226,.35)
+    }
+    .small{font-size:12px; color:var(--muted)}
+    /* ---- Typography in content ---- */
+    p{margin:6px 0}
+    strong{font-weight:700}
+    hr{border:none; border-top:1px solid var(--border); margin:10px 0}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; background:rgba(255,255,255,.06); padding:1px 5px; border-radius:6px; border:1px solid var(--border)}
+    @media (max-width:600px){
+      .brand h1{font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Endora · Legal</h1>
+          <div class="kvs">
+            <span class="kv">GDPR-first</span>
+            <span class="kv">EU-hosted</span>
+            <span class="kv">Guest-friendly</span>
+          </div>
+        </div>
+      </div>
+      <nav>
+        <a href="#gtc">GTC</a>
+        <a href="#imprint">Imprint</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#dpa">DPA Summary</a>
+      </nav>
+    </header>
+
+    <!-- Intro -->
+    <section class="card">
+      <h2>Legal Notice, Privacy Policy & GTC</h2>
+      <p class="muted">Last updated: September 21, 2025</p>
+      <p>Below you’ll find the General Terms and Conditions (GTC), Imprint, Privacy Policy, and a plain-English DPA summary for Endora, your Hospitality Concierge.</p>
+      <div class="foot">
+        <a class="btn primary" href="#privacy">Read Privacy Policy</a>
+        <a class="btn" href="#gtc">Jump to GTC</a>
+      </div>
+    </section>
+
+    <!-- GTC -->
+    <section id="gtc" class="card">
+      <h2>📄 General Terms and Conditions (GTC)</h2>
+      <p class="small muted">Operator: Marco Luyckx (see Imprint)</p>
+
+      <div class="acc">
+        <details class="i" open>
+          <summary>1. Scope<span class="chev">›</span></summary>
+          <div class="content">
+            <p>These GTC apply to all digital services, consulting, and technical solutions under <strong>“Endora – Hospitality Concierge.”</strong> Services are primarily B2B and may include guest-facing components for accommodation providers (“Clients”).</p>
+          </div>
+        </details>
+
+        <details class="i">
+          <summary>2. Services & Infrastructure<span class="chev">›</span></summary>
+          <div class="content">
+            <p><strong>Endora Concierge (B2B):</strong> GDPR-aligned chat & automations for apartments, villas, hotels; vouchers/QR flows; recommendations; webhooks/integrations.</p>
+            <p><strong>Implementation & Consulting:</strong> setup, customization, n8n workflows, light training, docs.</p>
+            <p><strong>Optional Add-ons:</strong> affiliate routing, follow-ups, analytics dashboards.</p>
+            <p><strong>EU Hosting:</strong> Azure (EU region), Hetzner (DE), IONOS (DE). Formats and pricing tiers may evolve.</p>
+          </div>
+        </details>
+
+        <details class="i">
+          <summary>3–6. Contract, Prices, Roles, Technical Changes<span class="chev">›</span></summary>
+          <div class="content">
+            <p><strong>Contract:</strong> concluded via Paddle checkout/signed quote/written confirmation; payment completed.</p>
+            <p><strong>Prices & Payment:</strong> shown at checkout/quote; Paddle as Merchant of Record; subscriptions billed monthly in advance; taxes as shown.</p>
+            <p><strong>Roles & Access:</strong> Client manages its third-party accounts and lawful basis for guest data; provides accurate content.</p>
+            <p><strong>Technical Changes:</strong> Upstream provider changes/outages may affect features and are not a defect per se.</p>
+          </div>
+        </details>
+
+        <details class="i">
+          <summary>7–11. SLA, Acceptable Use, IP, AI Disclaimer, Liability<span class="chev">›</span></summary>
+          <div class="content">
+            <p><strong>SLA:</strong> No guaranteed uptime unless a separate SLA is signed; maintenance with reasonable notice.</p>
+            <p><strong>Acceptable Use:</strong> lawful use; no prohibited/illegal/misleading content; valid vouchers/offers.</p>
+            <p><strong>IP:</strong> Endora retains IP to software, templates, workflows; Client retains its content/trademarks.</p>
+            <p><strong>AI Disclaimer:</strong> AI outputs can be inaccurate; verify before consequential use; not professional advice.</p>
+            <p><strong>Liability:</strong> Intent/gross negligence per law; simple negligence limited to typical foreseeable damages; no liability for third-party/platform outages; non-waivable liabilities remain unaffected.</p>
+          </div>
+        </details>
+
+        <details class="i">
+          <summary>12–15. Data Protection, Termination, Confidentiality, Final Provisions<span class="chev">›</span></summary>
+          <div class="content">
+            <p><strong>Data Protection:</strong> see Privacy Policy; Art. 28 DPA available for Client processing.</p>
+            <p><strong>Termination/Withdrawal:</strong> subs cancel at period end; digital withdrawal may expire upon performance (§ 312g BGB); non-returnable once provided (§ 312g (2) No.1&2 BGB); termination for cause possible.</p>
+            <p><strong>Confidentiality:</strong> both parties keep confidential information secret.</p>
+            <p><strong>Law/Jurisdiction:</strong> German law; Mainz jurisdiction where permissible; severability applies.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Imprint -->
+    <section id="imprint" class="card">
+      <h2>📄 Imprint (Impressum)</h2>
+      <p><strong>Endora – Hospitality Concierge</strong> (freelance operation under the Eudemonia umbrella)<br>
+      <strong>Marco Luyckx</strong><br>
+      Holsteinstraße 6, 55118 Mainz, Germany</p>
+      <p><strong>Contact:</strong> <a href="mailto:info@eudemonia-coaching.de">info@eudemonia-coaching.de</a> · <a href="https://www.eudemonia-coaching.de" target="_blank" rel="noopener">www.eudemonia-coaching.de</a></p>
+      <p><strong>VAT:</strong> No VAT according to § 19 UStG (small business regulation)</p>
+      <p><strong>Responsible under § 55(2) RStV:</strong> Marco Luyckx, Holsteinstraße 6, 55118 Mainz</p>
+      <hr>
+      <p class="small">Disclaimer: Despite careful review, we assume no liability for external links. The operators of linked sites are solely responsible for their content.</p>
+    </section>
+
+    <!-- Privacy -->
+    <section id="privacy" class="card">
+      <h2>📄 Privacy Policy</h2>
+      <p class="muted">Status: September 2025</p>
+
+      <div class="acc">
+        <details class="i" open>
+          <summary>1–2. Scope & Controller<span class="chev">›</span></summary>
+          <div class="content">
+            <p>Applies to B2B Clients, guests using Endora chat/widgets/vouchers, and visitors to Endora pages.</p>
+            <p><strong>Controller (own purposes):</strong> Marco Luyckx – Eudemonia Coaching (Freelance), Holsteinstraße 6, 55118 Mainz, Germany · <a href="mailto:info@eudemonia-coaching.de">info@eudemonia-coaching.de</a></p>
+            <p><strong>Processor role:</strong> For guest data processed on Client instructions, Endora acts as Processor; a DPA (Art. 28 GDPR) applies.</p>
+          </div>
+        </details>
+
+        <details class="i">
+          <summary>3–5. Data, Purposes, Sub-Processors<span class="chev">›</span></summary>
+          <div class="content">
+            <p><strong>Controller (own):</strong> telemetry (timestamp, URL, UA, truncated IP), inquiries/business data, billing data via Paddle, optional affiliate redirects.</p>
+            <p><strong>Processor (Client):</strong> guest chat content, technical metadata, optional contact (email/phone) to deliver the concierge service.</p>
+            <p><strong>EU hosting & sub-processors:</strong> Microsoft Azure OpenAI (EU region e.g., Sweden Central), Hetzner (DE), IONOS (DE). Optional Google Ireland (EU) for Sheets logging (off by default).</p>
+          </div>
+        </details>
+
+        <details class="i">
+          <summary>6–9. Transfers, Retention, Legal Bases, Recipients<span class="chev">›</span></summary>
+          <div class="content">
+            <p><strong>Transfers:</strong> Core stack EU-hosted; third-country transfers only if Client mandates non-EU tools with safeguards (SCCs).</p>
+            <p><strong>Retention:</strong> logs up to 14 days; guest chat up to 30 days by default (unless otherwise agreed in DPA); invoices/correspondence 6–10 years.</p>
+            <p><strong>Legal bases:</strong> Art. 6(1)(b) contract; Art. 6(1)(f) legitimate interests; Art. 6(1)(a) consent; Art. 6(1)(c) legal obligations.</p>
+            <p><strong>Recipients:</strong> EU infrastructure above; Paddle for billing; advisors/authorities where required.</p>
+          </div>
+        </details>
+
+        <details class="i">
+          <summary>10–14. Rights, Security, DPA, Cookies, Changes<span class="chev">›</span></summary>
+          <div class="content">
+            <p><strong>Rights:</strong> access, rectification, erasure, restriction, portability, objection; withdraw consent anytime. Contact: <a href="mailto:info@eudemonia-coaching.de">info@eudemonia-coaching.de</a>. Supervisory authority: e.g., LfDI Rheinland-Pfalz.</p>
+            <p><strong>Security (Art. 32):</strong> TLS, least privilege, firewalling, audit logging, deletion routines.</p>
+            <p><strong>DPA:</strong> available for Client processing (sub-processor list, TOMs, EU localization).</p>
+            <p><strong>Cookies:</strong> none non-essential by design; if analytics/ads added later, a consent banner and this section will be updated.</p>
+            <p><strong>Changes:</strong> updates posted here; current version applies.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- DPA Summary -->
+    <section id="dpa" class="card">
+      <h2>📄 Data Processing Agreement (DPA) — Summary</h2>
+      <p>This is a plain-English summary. The binding DPA text is provided as a separate document or annex.</p>
+      <ul>
+        <li><strong>Roles:</strong> Client = Controller; Endora (Marco Luyckx) = Processor.</li>
+        <li><strong>Subject:</strong> Guest concierge processing for the contract term.</li>
+        <li><strong>Nature/Purpose:</strong> handle guest inquiries; route recommendations; optional follow-ups.</li>
+        <li><strong>Data:</strong> chat content, timestamps, session IDs, truncated IP/device, optional contact.</li>
+        <li><strong>TOMs:</strong> encryption in transit, access controls, logging, minimization, deletion.</li>
+        <li><strong>Sub-processors:</strong> Azure OpenAI (EU), Hetzner (DE), IONOS (DE); optional Google Ireland (EU) if enabled.</li>
+        <li><strong>Transfers:</strong> EU-hosted; third-country only if mandated by Client with SCCs.</li>
+        <li><strong>Assistance:</strong> DSARs, security, DPIAs (reasonable efforts).</li>
+        <li><strong>Breach:</strong> notify without undue delay if Client data is affected.</li>
+        <li><strong>End-of-term:</strong> delete/return data per Client instruction & legal duties.</li>
+        <li><strong>Audits:</strong> reasonable documentation/co-operation; on-site by arrangement & at Client cost.</li>
+      </ul>
+      <div class="foot">
+        <a class="btn" href="#imprint">Imprint</a>
+        <a class="btn primary" href="#privacy">Privacy Policy</a>
+      </div>
+    </section>
+
+    <!-- Footer Nav -->
+    <section class="card">
+      <h2>Links</h2>
+      <div class="foot">
+        <a class="btn" href="https://concierge.eudemonia-coaching.de/clients/endora/">back to Endora</a>
+        <a class="btn primary" href="https://www.eudemonia-coaching.de/enterprise" target="_blank" rel="noopener">More AI enterprise solutions</a>
+      </div>
+      <p class="small" style="margin-top:10px">© <span id="y"></span> Endora · All rights reserved.</p>
+    </section>
+  </div>
+
+  <script>
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
+    // Keyboard navigate accordion (optional, simple)
+    document.querySelectorAll('details summary').forEach(s=>{
+      s.setAttribute('tabindex','0');
+      s.addEventListener('keydown',e=>{
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); s.parentElement.open=!s.parentElement.open; }
+      });
+    });
+  </script>
+</body>
+</html>
