@@ -135,22 +135,28 @@
     .check-icon{width:46px;height:46px;background:var(--acc);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-right:16px;flex-shrink:0;font-weight:bold}
     .feature-text{font-size:1.05rem;font-weight:500;color:#e2e8f0}
 
-    /* --- PRICING --- */
-    .pricing-section{margin:80px 0 40px}
-    .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;max-width:980px;margin:24px auto 0}
-    .plan{background:linear-gradient(135deg,var(--card), rgba(74,144,226,.02));border:1px solid var(--card-border);border-radius:18px;padding:20px 18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .plan-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-    .plan-title{font-weight:800;font-size:1.05rem}
-    .plan-price{font-weight:800}
-    .plan-desc{color:var(--muted);font-size:.95rem;line-height:1.45;margin-top:6px}
-    .pricing-note{color:var(--muted);text-align:center;font-size:1rem;margin:8px 0 0}
+    /* PRICING */
+    .pricing-section{margin:90px 0 60px}
+    .pricing-section .section-title{margin-bottom:10px}
+    .pricing-note{color:var(--muted);text-align:center;margin-bottom:36px}
+    .pricing-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:26px;margin-top:22px
+    }
+    .price-card{
+      background:linear-gradient(135deg,var(--card), rgba(74,144,226,.02));
+      border:1px solid var(--card-border);border-radius:16px;padding:22px;
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)
+    }
+    .price-card h3{font-size:1.2rem;margin-bottom:8px}
+    .price-card p{color:#cbd5e1;line-height:1.55;margin-bottom:12px}
+    .price{font-weight:800;color:#fff}
+    .contact-cta{display:flex;justify-content:center;margin-top:18px}
+    .contact-cta a{display:inline-flex;align-items:center;gap:.5rem;
+      padding:12px 20px;border-radius:999px;background:transparent;color:var(--acc);
+      font-weight:800;text-decoration:none;border:2px solid var(--acc);transition:.25s}
+    .contact-cta a:hover{background:var(--acc);color:#000;transform:translateY(-2px)}
 
-    .pricing-contact{display:flex;justify-content:center;margin-top:22px}
-    .pricing-contact .cta-secondary{border-width:2px}
-
-    @media(max-width:980px){.pricing-grid{grid-template-columns:1fr 1fr}}
-    @media(max-width:640px){.pricing-grid{grid-template-columns:1fr}}
-    
     .footer{background:linear-gradient(135deg,#0a0a0a,#1a1a1a);padding:36px 0;text-align:center;border-top:1px solid var(--card-border);margin-top:90px}
     .footer-links{margin-top:16px}
     .footer-links a{color:var(--muted);text-decoration:none;margin:0 14px;transition:color .3s ease}
@@ -258,71 +264,72 @@
 
       <div class="features-grid">
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Plug &amp; play — ready in minutes</div></div>
-        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Runs in your branding</div></div>
+        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">White-label — runs in your branding</div></div>
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">GDPR-compliant, hosted in the EU</div></div>
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Additional revenue with no extra work</div></div>
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Franchise partner option</div></div>
         <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">24/7 service — nights &amp; weekends</div></div>
       </div>
-    </section>
 
-    <!-- PRICING -->
-    <section class="pricing-section" id="pricing">
-      <h2 class="section-title">Pricing</h2>
-      <p class="section-subtitle">Prices shown are VAT-exclusive where applicable</p>
+      <!-- PRICING (inserted between benefits and buttons) -->
+      <section class="pricing-section" id="pricing">
+        <h2 class="section-title">Pricing</h2>
+        <p class="pricing-note">Prices shown are VAT-exclusive where applicable</p>
 
-      <div class="pricing-grid">
-        <div class="plan">
-          <div class="plan-header">
-            <div class="plan-title">Initial Setup (with landing page)</div>
-            <div class="plan-price">€250.00</div>
+        <div class="pricing-grid">
+          <div class="price-card">
+            <h3>Initial Setup with Landing Page</h3>
+            <p>
+              Creation of a landing page for the Accommodation Concierge (AC) —
+              (Includes 3 revisions | Accessible via Eudemonia URL | Creation of QR code |
+              Hosting of the page as long as the AC subscription is active).
+            </p>
+            <p class="price">€ 190.00 (one-time)</p>
           </div>
-          <div class="plan-desc">
-            We create a branded landing page for Endora (three rounds of edits included),
-            host it under your URL, and provide a QR code pack.
+
+          <div class="price-card">
+            <h3>Initial Setup without Landing Page</h3>
+            <p>
+              You use your own landing page for the Accommodation Concierge (AC) —
+              (We provide the code snippet to access the AC, which must be implemented independently
+              (JSON/HTML knowledge required) | You provide the URL which we store in our database
+              for access | Creation of QR code).
+            </p>
+            <p class="price">€ 90.00 (one-time)</p>
+          </div>
+
+          <div class="price-card">
+            <h3>Accommodation Concierge</h3>
+            <p>
+              Your digital concierge system for guest communication and streamlined service bookings.
+              Professional setup, reliable hosting, and continuous updates included.
+            </p>
+            <p class="price">€ 29.00 / month</p>
+          </div>
+
+          <div class="price-card">
+            <h3>Endora</h3>
+            <p>
+              Your subscription to your digital concierge service — more revenue, less work, happier guests.
+              Billed monthly.
+            </p>
+            <p class="price">€ 9.00 / month</p>
           </div>
         </div>
 
-        <div class="plan">
-          <div class="plan-header">
-            <div class="plan-title">Initial Setup (without landing page)</div>
-            <div class="plan-price">€90.00</div>
-          </div>
-          <div class="plan-desc">
-            Use your own page: we provide the chat snippet; you embed it yourself
-            (basic JSON/HTML). Share your target URL for routing. QR codes included.
-          </div>
+        <div class="contact-cta">
+          <a href="mailto:info@eudemonia-coaching.de">For affiliate, partner, or custom offers → Contact us</a>
         </div>
+      </section>
 
-        <div class="plan">
-          <div class="plan-header">
-            <div class="plan-title">Endora</div>
-            <div class="plan-price">€9.00</div>
-          </div>
-          <div class="plan-desc">
-            Your digital concierge — more revenue, less work, happier guests. Billed monthly.
-          </div>
-        </div>
-      </div>
-
-      <div class="pricing-contact">
-        <a class="cta-secondary" href="mailto:info@eudemonia-coaching.de">
-          For affiliate inquiries, service partners or custom offers — contact us
-        </a>
-      </div>
-    </section>
-
-    <!-- ORDER CTA (unchanged, now sits after Pricing) -->
-    <section class="marketing-section" id="order">
+      <!-- ORDER CTAs -->
       <div class="cta-container">
         <a class="cta-primary" href="https://buy.stripe.com/dRmdRab5I2gycqN3nA0Jq00">Order Endora (with landing page)</a>
         <a class="cta-secondary" href="https://buy.stripe.com/aFaaEY0r4aN4cqN2jw0Jq01">Order Endora (without landing page)</a>
       </div>
 
       <div class="legal-line">
-        <a href="https://eudemoniaautomation.github.io/endora/legal.html" target="_blank" rel="noopener">
-          Legal Notice | Privacy Policy | Terms &amp; Conditions
-        </a>
+        <a href="https://eudemoniaautomation.github.io/endora/legal.html" target="_blank" rel="noopener">Legal Notice | Privacy Policy | Terms &amp; Conditions</a>
       </div>
     </section>
   </div>
@@ -333,7 +340,7 @@
     <div class="footer-links">
       <a href="#how-it-works">How it works</a>
       <a href="#benefits">Benefits</a>
-      <a href="mailto:info@eudemonia-coaching.de">Contact</a>
+      <a href="mailto:contact@eudemonia-coaching.de">Contact</a>
     </div>
   </footer>
 
@@ -392,7 +399,6 @@
       wireTyping('inline-messages','inline-input-area','inline-typing');
       wireTyping('popup-messages','popup-input-area','popup-typing');
 
-      // One-off welcome text rewrite safety
       const DESIRED = "Welcome! 👋 I'm Endora, your Digital Concierge. Ask me anything about your stay.";
       function safeRewrite(containerId){
         const container = document.getElementById(containerId);
@@ -412,7 +418,6 @@
       }
       safeRewrite('inline-messages'); safeRewrite('popup-messages');
 
-      // QR opens popup
       const qr = document.getElementById('apt-qr');
       qr?.addEventListener('click', (e)=>{
         e.preventDefault();
@@ -420,7 +425,6 @@
         if (wrap) wrap.style.display = 'block';
       });
 
-      // Generate QR for this page
       (function setQr(){
         const target = location.origin + location.pathname;
         const src = 'https://quickchart.io/qr?text=' + encodeURIComponent(target) +
