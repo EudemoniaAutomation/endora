@@ -270,7 +270,7 @@
     </div>
   </footer>
 
-  <!-- Popup overlay & popup chat -->
+  <!-- Popup overlay & popup chat (self-contained) -->
   <div class="popup-overlay" id="popup-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:999;display:none"></div>
   <div class="popup-wrap" id="popup-wrap" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1000;display:none;width:min(92vw,520px);max-height:80vh">
     <div class="chat-window" id="popup-chat">
@@ -289,79 +289,136 @@
     </div>
   </div>
 
-  <!-- Inline mini-loader to wire the chat (temporary one-off) -->
+  <!-- Self-contained chat wiring (no external loader) -->
   <script>
     (function(){
-      // ---- NEVER AUTO-OPEN ON ARRIVAL
+      const WEBHOOK = "https://automation.eudemonia-coaching.de/webhook/477363f3-7434-4c31-92e5-fb4da3db4150";
+
+      // never auto-open
       const url = new URL(window.location.href);
       if (url.hash === '#openChat') url.hash = '';
       if (url.searchParams.has('openChat')) url.searchParams.delete('openChat');
       history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
 
-      // ---- ELEMENT REFS
-      const inline = {
-        messages: document.getElementById('inline-messages'),
-        input:    document.getElementById('inline-input'),
-        inputArea:document.getElementById('inline-input-area'),
-        send:     document.getElementById('inline-send')
-      };
-      const popup = {
-        wrap:   document.getElementById('popup-wrap'),
-        overlay:document.getElementById('popup-overlay'),
-        messages:document.getElementById('popup-messages'),
-        input:    document.getElementById('popup-input'),
-        inputArea:document.getElementById('popup-input-area'),
-        send:     document.getElementById('popup-send'),
-        close:    document.getElementById('popup-close')
-      };
-      const qrLink = document.getElementById('apt-qr');
+      // DOM
+      const overlay = document.getElementById('popup-overlay');
+      const wrap    = document.getElementById('popup-wrap');
 
-      const WEBHOOK = 'https://automation.eudemonia-coaching.de/webhook/477363f3-7434-4c31-92e5-fb4da3db4150';
-      const FIRST_LINE = "Welcome! 👋 I'm Endora, your Digital Concierge. Ask me anything about your stay.";
-
-      // ---- BASIC HELPERS
-      function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
-      function addMsg(target, text, who='bot'){
-        const m = el('div','msg '+who); m.textContent = text;
-        target.appendChild(m); target.scrollTop = target.scrollHeight;
-        return m;
+      // --- helpers
+      function linkify(text){
+        const safe = String(text || '')
+          .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        return safe.replace(/((https?:\/\/|www\.)[^\s<]+)/gi,(m)=>{
+          const href = m.startsWith('http') ? m : 'https://' + m;
+          try{ new URL(href); }catch{ return m; }
+          return `<a href="${href}" target="_blank" rel="noopener">${href.replace(/^https?:\/\/(www\.)?/,'')}</a>`;
+        });
+      }
+      function msg(el, text, who='bot'){
+        const d = document.createElement('div');
+        d.className = 'msg ' + (who==='user'?'user':'bot');
+        if (who==='bot'){ d.innerHTML = linkify(text); } else { d.textContent = text; }
+        el.appendChild(d);
+        el.scrollTop = el.scrollHeight;
       }
 
-      // ---- NICE WAITING ANIMATION + TYPING BUBBLES
-      function setWaiting(areaId, typingId, on){
-        const area = document.getElementById(areaId);
-        const bub  = document.getElementById(typingId);
-        if(!area || !bub) return;
-        if(on){ area.classList.add('waiting'); bub.classList.add('show'); }
-        else  { area.classList.remove('waiting'); bub.classList.remove('show'); }
+      async function callWebhook(question){
+        const res = await fetch(WEBHOOK, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Accept':'application/json, text/plain; q=0.9, */*; q=0.8'},
+          body:JSON.stringify({ question, url: location.href, source:'inline' })
+        });
+        // accept JSON or text replies
+        const ct = (res.headers.get('content-type')||'').toLowerCase();
+        if (ct.includes('application/json')) {
+          const j = await res.json();
+          return String(
+            j.answer || j.output || j.message || j.text ||
+            (j.choices && j.choices[0] && (j.choices[0].message?.content || j.choices[0].text)) ||
+            ''
+          ).trim();
+        }
+        return (await res.text()).trim();
       }
 
-      // ---- SEND LOGIC
-      async function send(where='inline'){
-        const ctx = (where==='popup') ? popup : inline;
-        const text = (ctx.input.value || '').trim();
-        if(!text) return;
-        addMsg(inline.messages, text, 'user');
-        addMsg(popup.messages,  text, 'user');
-        ctx.input.value='';
+      function wireChat(scope){
+        const msgs     = document.getElementById(scope+'-messages');
+        const input    = document.getElementById(scope+'-input');
+        const sendBtn  = document.getElementById(scope+'-send');
+        const inputBox = document.getElementById(scope+'-input-area');
+        const typing   = document.getElementById(scope+'-typing');
 
-        setWaiting('inline-input-area','inline-typing', true);
-        setWaiting('popup-input-area','popup-typing',   true);
+        // initial welcome (desired sentence)
+        msg(msgs, "Welcome! 👋 I'm Endora, your Digital Concierge. Ask me anything about your stay.", 'bot');
 
-        try{
-          const res = await fetch(WEBHOOK, {
-            method:'POST',
-            headers:{'Content-Type':'application/json','Accept':'application/json, text/plain; q=0.9, */*; q=0.8'},
-            body: JSON.stringify({ question:text, url:location.href, meta:{ brand:'Endora' } })
-          });
+        async function send(){
+          const q = (input.value || '').trim();
+          if(!q) return;
+          msg(msgs, q, 'user');
+          input.value = '';
+          inputBox.classList.add('waiting');
+          typing.classList.add('show');
 
-          // read best-effort
-          let reply = '';
-          const ct = (res.headers.get('content-type')||'').toLowerCase();
-          if(ct.includes('application/json')){
-            const data = await res.json();
-            reply = (data?.answer || data?.output || data?.text || data?.message || data?.content || data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || '') + '';
-          }else{
-            reply = await res.text();
+          // lightweight "sending…" chip while we wait
+          const chip = document.createElement('div');
+          chip.className = 'msg bot';
+          chip.textContent = '…';
+          msgs.appendChild(chip);
+          msgs.scrollTop = msgs.scrollHeight;
+
+          try{
+            const reply = await callWebhook(q);
+            chip.remove();
+            msg(msgs, reply || 'No answer received.', 'bot');
+          }catch(e){
+            chip.remove();
+            msg(msgs, '⚠️ Connection error. Please try again in a moment.', 'bot');
+          }finally{
+            inputBox.classList.remove('waiting');
+            typing.classList.remove('show');
           }
-          reply = (reply || '').trim() || 'No
+        }
+
+        sendBtn.addEventListener('click', send);
+        input.addEventListener('keydown', e=>{ if(e.key === 'Enter') send(); });
+      }
+
+      wireChat('inline');
+      wireChat('popup');
+
+      // QR opens popup
+      document.getElementById('apt-qr')?.addEventListener('click', (e)=>{
+        e.preventDefault();
+        overlay.style.display = 'block';
+        wrap.style.display    = 'block';
+        setTimeout(()=>document.getElementById('popup-input')?.focus(), 100);
+      });
+      document.getElementById('bubble-btn')?.addEventListener('click', ()=>{
+        overlay.style.display = 'block';
+        wrap.style.display    = 'block';
+        setTimeout(()=>document.getElementById('popup-input')?.focus(), 100);
+      });
+      document.getElementById('popup-close')?.addEventListener('click', ()=>{
+        overlay.style.display = 'none';
+        wrap.style.display    = 'none';
+      });
+      overlay?.addEventListener('click', ()=>{
+        overlay.style.display = 'none';
+        wrap.style.display    = 'none';
+      });
+
+      // generate QR (points to this page; we open popup via click handler above)
+      (function setQr(){
+        const target = location.origin + location.pathname;
+        const src = 'https://quickchart.io/qr?text=' + encodeURIComponent(target) +
+                    '&size=260&margin=8&ecLevel=H&format=png&dark=%23000000&light=%23ffffff';
+        const fallback = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(target);
+        const img = document.getElementById('apt-qr-img');
+        if(!img) return;
+        img.onerror = () => { if(img.dataset.fallback!=='1'){ img.dataset.fallback='1'; img.src=fallback; } };
+        img.src = src;
+      })();
+    })();
+  </script>
+</body>
+</html>
