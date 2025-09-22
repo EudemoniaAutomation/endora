@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Endora - Happier Guests, More Revenue, Less Work</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;overflow-x:hidden}
+    :root{
+      --bg:#000000;--ink:#ffffff;--muted:#94a3b8;
+      --acc:#4A90E2;--acc-glow:#6BA3F5;--acc-dark:#2E5C8A;
+      --card:rgba(15,15,15,.8);--card-border:rgba(74,144,226,.15);--glass:rgba(255,255,255,.03);
+      --qr_size:180px;--bubble_size:62px;
+      --wall2:url('https://d1yei2z3i6k35z.cloudfront.net/12820362/68a47346dc795_ModernCozyLivingRoom.jpeg?width=1920');
+    }
+    body::before{
+      content:"";position:fixed;inset:0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(74,144,226,.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(74,144,226,.10) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(107,163,245,.08) 0%, transparent 40%),
+        linear-gradient(180deg,#000 0%,#0a0a0a 100%);
+      z-index:0;animation:backgroundShift 20s ease infinite
+    }
+    @keyframes backgroundShift{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.1) rotate(1deg)}}
+
+    .particles{position:fixed;inset:0;z-index:1;pointer-events:none}
+    .particle{position:absolute;width:2px;height:2px;background:var(--acc);border-radius:50%;opacity:0;animation:float 15s infinite;box-shadow:0 0 10px var(--acc-glow)}
+    @keyframes float{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) translateX(100px);opacity:0}}
+
+    .container{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:40px 20px}
+
+    .hero{text-align:center;padding:80px 0 60px;animation:fadeInUp 1s ease}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    .hero-badge{display:inline-block;padding:8px 20px;background:linear-gradient(135deg, rgba(74,144,226,.2), rgba(74,144,226,.05));border:1px solid var(--card-border);border-radius:50px;font-size:12px;letter-spacing:2px;color:var(--acc);margin-bottom:30px;animation:pulse 2s infinite;text-transform:uppercase}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:.9}}
+    .hero h1{font-size:clamp(2.5rem,8vw,4.25rem);font-weight:900;line-height:1.1;margin-bottom:20px;background:linear-gradient(135deg,#fff 0%,var(--acc) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:0 0 80px rgba(74,144,226,.5)}
+    .hero-subtitle{font-size:clamp(1.1rem,3vw,1.4rem);color:var(--muted);max-width:740px;margin:0 auto 40px;line-height:1.6}
+
+    .cta-container{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin:28px 0}
+    .cta-primary{
+      display:inline-flex;align-items:center;gap:10px;padding:18px 34px;
+      background:linear-gradient(135deg,var(--acc),var(--acc-glow));color:#000;
+      font-weight:800;font-size:1.05rem;text-decoration:none;border-radius:50px;
+      transition:.3s;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(74,144,226,.4)
+    }
+    .cta-primary:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 15px 60px rgba(74,144,226,.6)}
+    .cta-secondary{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:transparent;color:var(--acc);font-weight:800;font-size:1rem;text-decoration:none;border:2px solid var(--acc);border-radius:50px;transition:.3s}
+    .cta-secondary:hover{color:#000;transform:translateY(-3px);box-shadow:0 10px 40px rgba(74,144,226,.4);background:var(--acc)}
+
+    .demo-section{margin:60px 0;animation:fadeInUp 1.2s ease}
+    .demo-card{background:linear-gradient(135deg,var(--card), rgba(74,144,226,.02));border:1px solid var(--card-border);border-radius:30px;padding:40px 30px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:relative;overflow:hidden;text-align:center}
+    .demo-card::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,var(--acc-glow),transparent);opacity:.1;animation:shimmer 3s infinite}
+    @keyframes shimmer{0%{transform:translateX(-100%) translateY(-100%) rotate(45deg)}100%{transform:translateX(100%) translateY(100%) rotate(45deg)}}
+
+    .wallpaper{
+      position:absolute;inset:16px;border-radius:28px;z-index:1;
+      background-image:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.55)), var(--wall2);
+      background-size:cover;background-position:center;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .demo-title,.demo-subtitle,.chat-window,.qr-section{position:relative;z-index:2}
+    .demo-title{font-size:2rem;font-weight:800;margin-bottom:12px}
+    .demo-subtitle{color:var(--muted);margin-bottom:26px;font-size:1.05rem}
+
+    .chat-window{max-width:520px;height:500px;margin:0 auto 20px;background:rgba(10,10,10,.9);border:1px solid rgba(74,144,226,.2);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;flex-direction:column;position:relative}
+    .chat-header{background:linear-gradient(90deg,var(--acc),var(--acc-glow));color:#000;padding:14px 18px;font-weight:800;display:flex;align-items:center;justify-content:space-between;font-size:1.05rem}
+    .chat-close{background:transparent;border:none;color:#000;font-size:22px;font-weight:900;cursor:pointer;transition:.3s}
+    .chat-close:hover{transform:rotate(90deg)}
+    .chat-messages{flex:1;overflow-y:auto;padding:18px;background:rgba(5,5,5,.6);display:flex;flex-direction:column;gap:12px}
+    .msg{padding:12px 16px;border-radius:18px;max-width:85%;font-size:14px;line-height:1.5;animation:msgPop .3s ease;word-wrap:break-word;overflow-wrap:anywhere}
+    .msg a{color:var(--acc-glow);text-decoration:underline;font-weight:700}
+    .msg a:hover{text-decoration:none;filter:brightness(1.1)}
+    @keyframes msgPop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+    .user{background:linear-gradient(135deg, rgba(74,144,226,.2), rgba(74,144,226,.1));align-self:flex-end;color:#fff;border:1px solid rgba(74,144,226,.3)}
+    .bot{background:rgba(255,255,255,.05);align-self:flex-start;color:#e2e8f0;border:1px solid rgba(255,255,255,.1)}
+    .chat-input-area{display:flex;border-top:1px solid rgba(74,144,226,.2);background:rgba(10,10,10,.9);position:relative;overflow:hidden}
+    .chat-input{flex:1;border:none;padding:14px 18px;font-size:14px;background:transparent;color:#fff;outline:none}
+    .chat-input::placeholder{color:rgba(148,163,184,.7)}
+    .chat-send{background:linear-gradient(135deg,var(--acc),var(--acc-glow));color:#000;border:none;padding:0 22px;cursor:pointer;font-weight:800;transition:.3s}
+    .chat-send:hover{background:linear-gradient(135deg,var(--acc-glow),var(--acc-glow))}
+
+    /* WAITING EFFECTS */
+    .chat-input-area.waiting::after{
+      content:""; position:absolute; left:0; right:0; bottom:0; height:2px;
+      background:linear-gradient(90deg, transparent, var(--acc), transparent);
+      background-size:200% 100%;
+      animation:inputShimmer 1.6s ease-in-out infinite;
+      opacity:.6;
+    }
+    @keyframes inputShimmer{0%{background-position:-50% 0}100%{background-position:150% 0}}
+
+    .typing-bubbles{
+      position:absolute; left:14px; bottom:56px; display:flex; align-items:center; gap:8px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+      padding:8px 10px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); opacity:0; transform:translateY(6px);
+      transition:opacity .25s ease, transform .25s ease;
+    }
+    .typing-bubbles.show{opacity:1; transform:translateY(0)}
+    .typing-bubbles .dot{width:6px;height:6px;border-radius:50%;background:#e5e7eb;opacity:.8;animation:dotBounce 1.2s infinite ease-in-out}
+    .typing-bubbles .dot:nth-child(2){animation-delay:.15s}
+    .typing-bubbles .dot:nth-child(3){animation-delay:.3s}
+    @keyframes dotBounce{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-6px);opacity:1}}
+
+    .qr-section{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:22px;position:relative}
+    .qr-wrapper{position:relative;width:var(--qr_size);height:var(--qr_size)}
+    .qr-container{position:absolute;inset:0;background:linear-gradient(135deg, rgba(255,255,255,.97), rgba(255,255,255,.9));border-radius:24px;padding:14px;box-shadow:0 20px 60px rgba(74,144,226,.35), inset 0 0 20px rgba(74,144,226,.1);display:grid;place-items:center;cursor:pointer;transition:.3s;animation:qrGlow 3s infinite;text-decoration:none}
+    @keyframes qrGlow{0%,100%{box-shadow:0 20px 60px rgba(74,144,226,.3), inset 0 0 20px rgba(74,144,226,.1)}50%{box-shadow:0 20px 80px rgba(74,144,226,.5), inset 0 0 30px rgba(74,144,226,.2)}}
+    .qr-container:hover{transform:scale(1.05)}
+    .qr-container img{display:block;width:100%;height:100%;object-fit:contain}
+
+    .chat-bubble{position:absolute;bottom:-10px;right:-10px;width:var(--bubble_size);height:var(--bubble_size);background:linear-gradient(135deg,var(--acc),var(--acc-glow));border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:24px;box-shadow:0 10px 40px rgba(74,144,226,.5), inset 0 -3px 10px rgba(0,0,0,.2);transition:.3s;animation:bubblePulse 2s infinite;z-index:10}
+    @keyframes bubblePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+    .chat-badge{position:absolute;top:-5px;right:-5px;background:#ff3366;color:#fff;font-size:12px;font-weight:bold;padding:4px 8px;border-radius:20px;display:none}
+
+    .qr-info{text-align:center;color:var(--muted);font-size:14px;max-width:300px}
+    .qr-info strong{color:var(--acc);display:block;font-size:16px;margin-bottom:5px}
+
+    .marketing-section{margin:90px 0;animation:fadeInUp 1.1s ease}
+    .section-title{font-size:2.6rem;font-weight:800;text-align:center;margin-bottom:14px;background:linear-gradient(135deg,#fff 0%,var(--acc) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .section-subtitle{text-align:center;font-size:1.18rem;color:var(--muted);max-width:680px;margin:0 auto 36px}
+
+    .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:36px}
+    .step{text-align:center;position:relative;background:linear-gradient(135deg,var(--card), rgba(74,144,226,.02));border:1px solid var(--card-border);border-radius:20px;padding:26px 18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:transform .3s ease}
+    .step:hover{transform:translateY(-5px)}
+    .step-number{width:80px;height:80px;background:linear-gradient(135deg,var(--acc),var(--acc-glow));color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;margin:0 auto 14px;box-shadow:0 10px 25px rgba(74,144,226,.3)}
+    .step h4{font-size:1.15rem;margin-bottom:10px;color:var(--acc);font-weight:700}
+    .step p{color:var(--muted);font-size:.98rem}
+
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin:40px 0}
+    .feature-item{display:flex;align-items:center;background:linear-gradient(135deg,var(--card), rgba(74,144,226,.02));border:1px solid var(--card-border);padding:24px;border-radius:16px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:transform .3s ease}
+    .feature-item:hover{transform:translateY(-3px)}
+    .check-icon{width:46px;height:46px;background:var(--acc);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-right:16px;flex-shrink:0;font-weight:bold}
+    .feature-text{font-size:1.05rem;font-weight:500;color:#e2e8f0}
+
+    .footer{background:linear-gradient(135deg,#0a0a0a,#1a1a1a);padding:36px 0;text-align:center;border-top:1px solid var(--card-border);margin-top:90px}
+    .footer-links{margin-top:16px}
+    .footer-links a{color:var(--muted);text-decoration:none;margin:0 14px;transition:color .3s ease}
+    .footer-links a:hover{color:var(--acc)}
+    .legal-line{ text-align:center; margin-top:12px; font-size:12px; color:var(--muted); }
+    .legal-line a{ color:var(--muted); text-decoration:none; }
+    .legal-line a:hover{ color:var(--acc); text-decoration:underline; }
+
+    @media (max-width:900px){.steps-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){
+      .hero h1{font-size:2.5rem}.hero-subtitle{font-size:1.1rem}
+      .steps-grid{grid-template-columns:1fr;gap:18px}
+      .section-title{font-size:2.1rem}
+      .container{padding:0 14px}
+      .demo-card{padding:26px 18px}
+      .chat-window{height:460px}
+      .qr-section{flex-direction:column;gap:18px}
+    }
+  </style>
+</head>
+<body>
+  <!-- Particles -->
+  <div class="particles">
+    <div class="particle" style="left:10%;animation-delay:0s"></div>
+    <div class="particle" style="left:20%;animation-delay:2s"></div>
+    <div class="particle" style="left:30%;animation-delay:4s"></div>
+    <div class="particle" style="left:40%;animation-delay:6s"></div>
+    <div class="particle" style="left:50%;animation-delay:8s"></div>
+    <div class="particle" style="left:60%;animation-delay:10s"></div>
+    <div class="particle" style="left:70%;animation-delay:12s"></div>
+    <div class="particle" style="left:80%;animation-delay:14s"></div>
+    <div class="particle" style="left:90%;animation-delay:1s"></div>
+  </div>
+
+  <div class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-badge">✨ The Future of Hospitality</div>
+      <h1>Endora - more revenue, less work, happier guests</h1>
+      <p class="hero-subtitle">One QR code in the apartment is all it takes—your guests enjoy premium service while you earn automatically.</p>
+      <div class="cta-container">
+        <!-- Updated to match bottom CTAs + same Stripe links -->
+        <a class="cta-primary" href="https://buy.stripe.com/dRmdRab5I2gycqN3nA0Jq00">Order Endora (with landing page)</a>
+        <a class="cta-secondary" href="https://buy.stripe.com/aFaaEY0r4aN4cqN2jw0Jq01">Order Endora (without landing page)</a>
+      </div>
+    </section>
+
+    <!-- DEMO / CHAT -->
+    <section class="demo-section" id="openChat">
+      <div class="demo-card">
+        <div class="wallpaper" aria-hidden="true"></div>
+
+        <h2 class="demo-title">Live demo — meet Endora</h2>
+        <p class="demo-subtitle">Ask anything: check-in, house rules, amenities, or local tips. Endora replies instantly.</p>
+
+        <div class="chat-window" id="inline-chat">
+          <div class="chat-header">
+            <span>💬 Endora</span>
+            <button class="chat-close" id="inline-close" style="display:none">×</button>
+          </div>
+          <div class="chat-messages" id="inline-messages"></div>
+          <div class="chat-input-area" id="inline-input-area">
+            <input type="text" class="chat-input" id="inline-input" placeholder="Ask e.g. ‘Where’s a great place to eat tonight?’" />
+            <button class="chat-send" id="inline-send">Send</button>
+            <div id="inline-typing" class="typing-bubbles" aria-hidden="true">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR -->
+        <div class="qr-section">
+          <div class="qr-wrapper">
+            <a class="qr-container" id="apt-qr" href="#" title="Scan to open the chat">
+              <img id="apt-qr-img" alt="QR to open chat"/>
+            </a>
+            <div class="chat-bubble" id="bubble-btn" aria-label="Open chat">💬
+              <span class="chat-badge" id="bubble-badge">1</span>
+            </div>
+          </div>
+          <div class="qr-info">
+            <strong>Scan the QR</strong>
+            Guests open the chat on their phone instantly, no app required.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="marketing-section" id="how-it-works">
+      <h2 class="section-title">How it works</h2>
+      <p class="section-subtitle">Four simple steps to more revenue and happier guests</p>
+
+      <div class="steps-grid">
+        <div class="step"><div class="step-number">1</div><h4>Place the QR code</h4><p>Stick it in the apartment — done in 30 seconds.</p></div>
+        <div class="step"><div class="step-number">2</div><h4>Guests scan</h4><p>They scan with their phone → the chat opens instantly, no app needed.</p></div>
+        <div class="step"><div class="step-number">3</div><h4>Get recommendations</h4><p>Local tips and vetted partner services right in the chat.</p></div>
+        <div class="step"><div class="step-number">4</div><h4>Earn automatically</h4><p>Provide outstanding service to your guests and receive commissions with zero extra effort.</p></div>
+      </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section class="marketing-section" id="benefits">
+      <h2 class="section-title">Benefits at a glance</h2>
+      <p class="section-subtitle">Everything you need to take your rental to the next level</p>
+
+      <div class="features-grid">
+        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Plug &amp; play — ready in minutes</div></div>
+        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">White-label — runs in your branding</div></div>
+        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">GDPR-compliant, hosted in the EU</div></div>
+        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Additional revenue with no extra work</div></div>
+        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">Franchise partner option</div></div>
+        <div class="feature-item"><div class="check-icon">✓</div><div class="feature-text">24/7 service — nights &amp; weekends</div></div>
+      </div>
+
+      <div class="cta-container">
+        <a class="cta-primary" href="https://buy.stripe.com/dRmdRab5I2gycqN3nA0Jq00">Order Endora (with landing page)</a>
+        <a class="cta-secondary" href="https://buy.stripe.com/aFaaEY0r4aN4cqN2jw0Jq01">Order Endora (without landing page)</a>
+      </div>
+
+      <div class="legal-line">
+        <a href="https://concierge.eudemonia-coaching.de/clients/endora/legal.html" target="_blank" rel="noopener">Legal Notice | Privacy Policy | Terms &amp; Conditions</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>© 2025 Endora — GDPR-compliant &amp; made in EU</div>
+    <div class="footer-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#benefits">Benefits</a>
+      <a href="mailto:contact@eudemonia-coaching.de">Contact</a>
+    </div>
+  </footer>
+
+  <!-- Popup overlay & popup chat (used by core) -->
+  <div class="popup-overlay" id="popup-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:999;display:none"></div>
+  <div class="popup-wrap" id="popup-wrap" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1000;display:none;width:min(92vw,520px);max-height:80vh">
+    <div class="chat-window" id="popup-chat">
+      <div class="chat-header">
+        <span>💬 Endora</span>
+        <button class="chat-close" id="popup-close" title="Close">×</button>
+      </div>
+      <div class="chat-messages" id="popup-messages"></div>
+      <div class="chat-input-area" id="popup-input-area">
+        <input type="text" class="chat-input" id="popup-input" placeholder="Ask about check-in, amenities…" />
+        <button class="chat-send" id="popup-send">Send</button>
+        <div id="popup-typing" class="typing-bubbles" aria-hidden="true">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      // Never auto-open on arrival
+      const url = new URL(window.location.href);
+      if (url.hash === '#openChat') url.hash = '';
+      if (url.searchParams.has('openChat')) url.searchParams.delete('openChat');
+      history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+
+      const wrap = document.getElementById('popup-wrap');
+      const ovl  = document.getElementById('popup-overlay');
+      if (wrap) wrap.style.display = 'none';
+      if (ovl)  ovl.style.display  = 'none';
+
+      function wireTyping(messagesId, inputAreaId, typingId){
+        const messages  = document.getElementById(messagesId);
+        const inputArea = document.getElementById(inputAreaId);
+        const typing    = document.getElementById(typingId);
+        if(!messages || !inputArea || !typing) return;
+        const mo = new MutationObserver(muts=>{
+          muts.forEach(m=>{
+            m.addedNodes.forEach(n=>{
+              if(!(n instanceof HTMLElement)) return;
+              if(n.classList.contains('msg') && n.classList.contains('user')){
+                inputArea.classList.add('waiting'); typing.classList.add('show');
+              }
+              if(n.classList.contains('msg') && n.classList.contains('bot')){
+                inputArea.classList.remove('waiting'); typing.classList.remove('show');
+              }
+            });
+          });
+        });
+        mo.observe(messages,{childList:true});
+      }
+      wireTyping('inline-messages','inline-input-area','inline-typing');
+      wireTyping('popup-messages','popup-input-area','popup-typing');
+
+      const DESIRED = "Welcome! 👋 I'm Endora, your Digital Concierge. Ask me anything about your stay.";
+      function safeRewrite(containerId){
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        const observer = new MutationObserver(()=>{
+          const firstBot = container.querySelector('.msg.bot');
+          if(!firstBot) return;
+          const current = (firstBot.textContent || '').trim();
+          if (current === DESIRED) return;
+          if (current.includes("I'm Endora")) {
+            observer.disconnect();
+            firstBot.textContent = DESIRED;
+            setTimeout(()=>observer.observe(container,{childList:true,subtree:true}),0);
+          }
+        });
+        observer.observe(container,{childList:true,subtree:true});
+      }
+      safeRewrite('inline-messages'); safeRewrite('popup-messages');
+
+      const qr = document.getElementById('apt-qr');
+      qr?.addEventListener('click', (e)=>{
+        e.preventDefault();
+        if (ovl)  ovl.style.display  = 'block';
+        if (wrap) wrap.style.display = 'block';
+      });
+
+      (function setQr(){
+        const target = location.origin + location.pathname;
+        const src = 'https://quickchart.io/qr?text=' + encodeURIComponent(target) +
+                    '&size=260&margin=8&ecLevel=H&format=png&dark=%23000000&light=%23ffffff';
+        const fallback = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(target);
+        const img = document.getElementById('apt-qr-img');
+        if(!img) return;
+        img.onerror = () => { if(img.dataset.fallback!=='1'){ img.dataset.fallback='1'; img.src=fallback; } };
+        img.src = src;
+      })();
+    })();
+  </script>
+
+  <!-- Coreloader (exact page URL auto-sent; no auto-open) -->
+  <script
+    src="/chat-interface-tech-config/v1/coreloader.js"
+    data-webhook="https://automation.eudemonia-coaching.de/webhook/477363f3-7434-4c31-92e5-fb4da3db4150"
+    data-brand="Endora — Digital Concierge"
+    data-start-open="false">
+  </script>
+</body>
+</html>
