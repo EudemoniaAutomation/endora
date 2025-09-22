@@ -176,7 +176,6 @@
       <h1>Endora - more revenue, less work, happier guests</h1>
       <p class="hero-subtitle">One QR code in the apartment is all it takes—your guests enjoy premium service while you earn automatically.</p>
       <div class="cta-container">
-        <!-- Updated to match bottom CTAs + same Stripe links -->
         <a class="cta-primary" href="https://buy.stripe.com/dRmdRab5I2gycqN3nA0Jq00">Order Endora (with landing page)</a>
         <a class="cta-secondary" href="https://buy.stripe.com/aFaaEY0r4aN4cqN2jw0Jq01">Order Endora (without landing page)</a>
       </div>
@@ -271,7 +270,7 @@
     </div>
   </footer>
 
-  <!-- Popup overlay & popup chat (used by core) -->
+  <!-- Popup overlay & popup chat -->
   <div class="popup-overlay" id="popup-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:999;display:none"></div>
   <div class="popup-wrap" id="popup-wrap" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1000;display:none;width:min(92vw,520px);max-height:80vh">
     <div class="chat-window" id="popup-chat">
@@ -290,87 +289,79 @@
     </div>
   </div>
 
+  <!-- Inline mini-loader to wire the chat (temporary one-off) -->
   <script>
     (function(){
-      // Never auto-open on arrival
+      // ---- NEVER AUTO-OPEN ON ARRIVAL
       const url = new URL(window.location.href);
       if (url.hash === '#openChat') url.hash = '';
       if (url.searchParams.has('openChat')) url.searchParams.delete('openChat');
       history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
 
-      const wrap = document.getElementById('popup-wrap');
-      const ovl  = document.getElementById('popup-overlay');
-      if (wrap) wrap.style.display = 'none';
-      if (ovl)  ovl.style.display  = 'none';
+      // ---- ELEMENT REFS
+      const inline = {
+        messages: document.getElementById('inline-messages'),
+        input:    document.getElementById('inline-input'),
+        inputArea:document.getElementById('inline-input-area'),
+        send:     document.getElementById('inline-send')
+      };
+      const popup = {
+        wrap:   document.getElementById('popup-wrap'),
+        overlay:document.getElementById('popup-overlay'),
+        messages:document.getElementById('popup-messages'),
+        input:    document.getElementById('popup-input'),
+        inputArea:document.getElementById('popup-input-area'),
+        send:     document.getElementById('popup-send'),
+        close:    document.getElementById('popup-close')
+      };
+      const qrLink = document.getElementById('apt-qr');
 
-      function wireTyping(messagesId, inputAreaId, typingId){
-        const messages  = document.getElementById(messagesId);
-        const inputArea = document.getElementById(inputAreaId);
-        const typing    = document.getElementById(typingId);
-        if(!messages || !inputArea || !typing) return;
-        const mo = new MutationObserver(muts=>{
-          muts.forEach(m=>{
-            m.addedNodes.forEach(n=>{
-              if(!(n instanceof HTMLElement)) return;
-              if(n.classList.contains('msg') && n.classList.contains('user')){
-                inputArea.classList.add('waiting'); typing.classList.add('show');
-              }
-              if(n.classList.contains('msg') && n.classList.contains('bot')){
-                inputArea.classList.remove('waiting'); typing.classList.remove('show');
-              }
-            });
+      const WEBHOOK = 'https://automation.eudemonia-coaching.de/webhook/477363f3-7434-4c31-92e5-fb4da3db4150';
+      const FIRST_LINE = "Welcome! 👋 I'm Endora, your Digital Concierge. Ask me anything about your stay.";
+
+      // ---- BASIC HELPERS
+      function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+      function addMsg(target, text, who='bot'){
+        const m = el('div','msg '+who); m.textContent = text;
+        target.appendChild(m); target.scrollTop = target.scrollHeight;
+        return m;
+      }
+
+      // ---- NICE WAITING ANIMATION + TYPING BUBBLES
+      function setWaiting(areaId, typingId, on){
+        const area = document.getElementById(areaId);
+        const bub  = document.getElementById(typingId);
+        if(!area || !bub) return;
+        if(on){ area.classList.add('waiting'); bub.classList.add('show'); }
+        else  { area.classList.remove('waiting'); bub.classList.remove('show'); }
+      }
+
+      // ---- SEND LOGIC
+      async function send(where='inline'){
+        const ctx = (where==='popup') ? popup : inline;
+        const text = (ctx.input.value || '').trim();
+        if(!text) return;
+        addMsg(inline.messages, text, 'user');
+        addMsg(popup.messages,  text, 'user');
+        ctx.input.value='';
+
+        setWaiting('inline-input-area','inline-typing', true);
+        setWaiting('popup-input-area','popup-typing',   true);
+
+        try{
+          const res = await fetch(WEBHOOK, {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Accept':'application/json, text/plain; q=0.9, */*; q=0.8'},
+            body: JSON.stringify({ question:text, url:location.href, meta:{ brand:'Endora' } })
           });
-        });
-        mo.observe(messages,{childList:true});
-      }
-      wireTyping('inline-messages','inline-input-area','inline-typing');
-      wireTyping('popup-messages','popup-input-area','popup-typing');
 
-      const DESIRED = "Welcome! 👋 I'm Endora, your Digital Concierge. Ask me anything about your stay.";
-      function safeRewrite(containerId){
-        const container = document.getElementById(containerId);
-        if(!container) return;
-        const observer = new MutationObserver(()=>{
-          const firstBot = container.querySelector('.msg.bot');
-          if(!firstBot) return;
-          const current = (firstBot.textContent || '').trim();
-          if (current === DESIRED) return;
-          if (current.includes("I'm Endora")) {
-            observer.disconnect();
-            firstBot.textContent = DESIRED;
-            setTimeout(()=>observer.observe(container,{childList:true,subtree:true}),0);
+          // read best-effort
+          let reply = '';
+          const ct = (res.headers.get('content-type')||'').toLowerCase();
+          if(ct.includes('application/json')){
+            const data = await res.json();
+            reply = (data?.answer || data?.output || data?.text || data?.message || data?.content || data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || '') + '';
+          }else{
+            reply = await res.text();
           }
-        });
-        observer.observe(container,{childList:true,subtree:true});
-      }
-      safeRewrite('inline-messages'); safeRewrite('popup-messages');
-
-      const qr = document.getElementById('apt-qr');
-      qr?.addEventListener('click', (e)=>{
-        e.preventDefault();
-        if (ovl)  ovl.style.display  = 'block';
-        if (wrap) wrap.style.display = 'block';
-      });
-
-      (function setQr(){
-        const target = location.origin + location.pathname;
-        const src = 'https://quickchart.io/qr?text=' + encodeURIComponent(target) +
-                    '&size=260&margin=8&ecLevel=H&format=png&dark=%23000000&light=%23ffffff';
-        const fallback = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(target);
-        const img = document.getElementById('apt-qr-img');
-        if(!img) return;
-        img.onerror = () => { if(img.dataset.fallback!=='1'){ img.dataset.fallback='1'; img.src=fallback; } };
-        img.src = src;
-      })();
-    })();
-  </script>
-
-  <!-- Coreloader (exact page URL auto-sent; no auto-open) -->
-  <script
-    src="/chat-interface-tech-config/v1/coreloader.js"
-    data-webhook="https://automation.eudemonia-coaching.de/webhook/477363f3-7434-4c31-92e5-fb4da3db4150"
-    data-brand="Endora — Digital Concierge"
-    data-start-open="false">
-  </script>
-</body>
-</html>
+          reply = (reply || '').trim() || 'No
