@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Endora - Chat</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;min-height:100vh;overflow-x:hidden;display:flex;align-items:center;justify-content:center;padding:20px}
+
+    /* ==== Farb-Update: GELB statt Rot ==== */
+    :root{
+      --bg:#000000;--ink:#ffffff;--muted:#94a3b8;
+      --acc:#ffd700;          /* Akzent: Gelb */
+      --acc-glow:#ffeb3b;     /* Glow: helleres Gelb */
+      --card:rgba(15,15,15,.8);
+      --card-border:rgba(255,215,0,.15);
+      --qr_size:160px;--bubble_size:56px
+    }
+
+    body::before{
+      content:"";position:fixed;inset:0;
+      background:
+        radial-gradient(circle at 20% 50%,rgba(255,215,0,.15) 0%,transparent 50%),
+        radial-gradient(circle at 80% 80%,rgba(255,215,0,.10) 0%,transparent 50%),
+        radial-gradient(circle at 40% 20%,rgba(255,235,59,.08) 0%,transparent 40%),
+        linear-gradient(180deg,#000 0%,#0a0a0a 100%);
+      z-index:0;animation:backgroundShift 20s ease infinite
+    }
+    @keyframes backgroundShift{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.1) rotate(1deg)}}
+
+    .particles{position:fixed;inset:0;z-index:1;pointer-events:none}
+    .particle{position:absolute;width:2px;height:2px;background:var(--acc);border-radius:50%;opacity:0;animation:float 15s infinite;box-shadow:0 0 10px var(--acc-glow)}
+    @keyframes float{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) translateX(100px);opacity:0}}
+
+    .chat-container{position:relative;z-index:2;width:100%;max-width:400px;animation:fadeInUp 1s ease}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+    .header{text-align:center;margin-bottom:30px}
+    .hero-badge{display:inline-block;padding:8px 16px;background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,215,0,.05));border:1px solid var(--card-border);border-radius:50px;font-size:11px;letter-spacing:1px;color:var(--acc);margin-bottom:15px;animation:pulse 2s infinite;text-transform:uppercase}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:.9}}
+    .hero-title{font-size:2.2rem;font-weight:900;line-height:1.1;margin-bottom:15px;background:linear-gradient(135deg,#fff 0%,var(--acc) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:0 0 80px rgba(255,215,0,.5)}
+    .hero-subtitle{font-size:1rem;color:var(--muted);line-height:1.5;margin-bottom:20px}
+
+    .chat-window{width:100%;height:60vh;min-height:400px;max-height:600px;background:rgba(10,10,10,.9);border:1px solid var(--card-border);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,215,0,.1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;flex-direction:column;position:relative}
+    .chat-window::before{content:"";position:absolute;inset:-2px;border-radius:20px;background:linear-gradient(135deg,var(--acc),transparent,var(--acc));opacity:.3;animation:borderGlow 3s infinite;z-index:-1}
+    @keyframes borderGlow{0%,100%{opacity:.3}50%{opacity:.6}}
+    .chat-header{background:linear-gradient(90deg,var(--acc),#d4b000);color:#000;padding:15px 20px;font-weight:800;display:flex;align-items:center;justify-content:space-between;font-size:1.1rem}
+    .chat-close{background:transparent;border:none;color:#000;font-size:24px;font-weight:900;cursor:pointer;transition:.3s;display:none}
+    .chat-close:hover{transform:rotate(90deg)}
+    .chat-messages{flex:1;overflow-y:auto;padding:20px;background:rgba(5,5,5,.6);display:flex;flex-direction:column;gap:12px}
+    .msg{padding:12px 16px;border-radius:18px;max-width:85%;font-size:14px;line-height:1.5;animation:msgPop .3s ease}
+    @keyframes msgPop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+    .user{background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,215,0,.1));align-self:flex-end;color:#fff;border:1px solid rgba(255,215,0,.3)}
+    .bot{background:rgba(255,255,255,.05);align-self:flex-start;color:#e2e8f0;border:1px solid rgba(255,255,255,.1)}
+    .msg.bot p{margin:0 0 .5rem 0}
+    .msg.bot ul{margin:.25rem 0 .5rem 1.25rem;padding:0}
+    .msg.bot li{margin:.15rem 0}
+    .typing{display:flex;gap:6px;align-items:center}
+    .dot{width:6px;height:6px;border-radius:50%;background:#e2e8f0;opacity:.6;animation:bounce 1s infinite ease-in-out}
+    .dot:nth-child(2){animation-delay:.15s}
+    .dot:nth-child(3){animation-delay:.3s}
+    @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-6px);opacity:1}}
+    .chat-input-area{display:flex;border-top:1px solid var(--card-border);background:rgba(10,10,10,.9);padding:0}
+    .chat-input{flex:1;border:none;padding:18px 20px;font-size:16px;background:transparent;color:#fff;outline:none}
+    .chat-input::placeholder{color:rgba(148,163,184,.7)}
+    .chat-send{background:linear-gradient(135deg,var(--acc),#d4b000);color:#000;border:none;padding:0 30px;cursor:pointer;font-weight:800;transition:.3s;font-size:14px;text-transform:uppercase;letter-spacing:.5px}
+    .chat-send:hover{background:linear-gradient(135deg,#ffeb3b,#ffd700);transform:translateY(-1px)}
+    .chat-send:active{transform:translateY(0)}
+    .qr-section{display:flex;align-items:center;justify-content:center;margin-top:20px;position:relative}
+    .qr-wrapper{position:relative;width:var(--qr_size);height:var(--qr_size)}
+    .qr-container{position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.90));border-radius:16px;padding:12px;text-decoration:none;display:grid;place-items:center;cursor:pointer;box-shadow:0 20px 60px rgba(255,215,0,.30),inset 0 0 20px rgba(255,215,0,.12)}
+    .qr-container:hover{transform:scale(1.03)}
+    .qr-container img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges}
+    .chat-bubble{position:absolute;bottom:-8px;right:-8px;width:40px;height:40px;background:linear-gradient(135deg,var(--acc),#d4b000);border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:18px;box-shadow:0 10px 40px rgba(255,215,0,.5),inset 0 -3px 10px rgba(0,0,0,.2);transition:.3s;animation:bubblePulse 2s infinite;z-index:10}
+    @keyframes bubblePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+    .chat-badge{position:absolute;top:-5px;right:-5px;background:#00ff88;color:#000;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:10px;display:none}
+    .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:999;display:none}
+    .popup-wrap{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;display:none;animation:popupIn .3s ease;width:90vw;max-width:400px}
+    @keyframes popupIn{from{transform:translate(-50%,-50%) scale(.8);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+    .chat-messages::-webkit-scrollbar{width:4px}
+    .chat-messages::-webkit-scrollbar-track{background:rgba(255,255,255,.05)}
+    .chat-messages::-webkit-scrollbar-thumb{background:var(--acc);border-radius:2px}
+    @media (max-width:480px){body{padding:10px}.hero-title{font-size:1.8rem}.hero-subtitle{font-size:.9rem}.chat-window{height:70vh;min-height:350px;border-radius:16px}.chat-input{font-size:16px;padding:16px 18px}.chat-send{padding:0 24px}.header{margin-bottom:20px}.qr-section{margin-top:15px}}
+    @media (max-height:600px){.chat-window{height:50vh;min-height:300px}}
+  </style>
+</head>
+<body>
+  <!-- Particles -->
+  <div class="particles">
+    <div class="particle" style="left:10%;animation-delay:0s"></div>
+    <div class="particle" style="left:20%;animation-delay:2s"></div>
+    <div class="particle" style="left:30%;animation-delay:4s"></div>
+    <div class="particle" style="left:40%;animation-delay:6s"></div>
+    <div class="particle" style="left:50%;animation-delay:8s"></div>
+    <div class="particle" style="left:60%;animation-delay:10s"></div>
+    <div class="particle" style="left:70%;animation-delay:12s"></div>
+    <div class="particle" style="left:80%;animation-delay:14s"></div>
+    <div class="particle" style="left:90%;animation-delay:1s"></div>
+  </div>
+
+  <div class="chat-container">
+    <div class="header">
+      <div class="hero-badge">Premium Guest Experience</div>
+      <h1 class="hero-title">Endora</h1>
+      <p class="hero-subtitle">Your personal AI assistant for check-in, house rules, and local recommendations</p>
+    </div>
+
+    <!-- UI-MARKUP (Core/Loader hängt sich hier an) -->
+    <div class="chat-window" id="inline-chat">
+      <div class="chat-header">
+        <span>💬 Endora</span>
+        <button class="chat-close" id="inline-close" title="Minimize">×</button>
+      </div>
+      <div class="chat-messages" id="inline-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="inline-input" placeholder="Ask me anything about your stay..."/>
+        <button class="chat-send" id="inline-send">Send</button>
+      </div>
+    </div>
+
+    <div class="qr-section">
+      <div class="qr-wrapper">
+        <a class="qr-container" id="apt-qr" href="#openChat" title="Scan to open chat">
+          <img id="apt-qr-img" alt="QR to open chat"/>
+        </a>
+        <div class="chat-bubble" id="bubble-btn" aria-label="Open chat">💬
+          <span class="chat-badge" id="bubble-badge">1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup -->
+  <div class="popup-overlay" id="popup-overlay"></div>
+  <div class="popup-wrap" id="popup-wrap">
+    <div class="chat-window" id="popup-chat">
+      <div class="chat-header">
+        <span>💬 Endora</span>
+        <button class="chat-close" id="popup-close" title="Close">×</button>
+      </div>
+      <div class="chat-messages" id="popup-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="popup-input" placeholder="Ask about check-in, amenities..."/>
+        <button class="chat-send" id="popup-send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TECH: Loader dynamisch einfügen + kanonische page-url automatisch setzen -->
+  <script>
+    (function(){
+      var s = document.createElement('script');
+      s.src = '/chat-interface-tech-config/v1/coreloader.js';
+      s.setAttribute('data-webhook','https://automation.eudemonia-coaching.de/webhook/477363f3-7434-4c31-92e5-fb4da3db4150');
+      s.setAttribute('data-brand','Endora');
+      // Kanonische URL: origin + pathname (ohne Query/Hash)
+      try {
+        var u = new URL(window.location.href);
+        u.search = '';
+        u.hash   = '';
+        s.setAttribute('data-page-url', u.origin + u.pathname);
+      } catch (e) {
+        var raw = (window.location.href || '');
+        s.setAttribute('data-page-url', raw.split('#')[0].split('?')[0]);
+      }
+      s.setAttribute('data-start-open','false');
+      document.body.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
