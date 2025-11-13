@@ -1,15 +1,39 @@
 export interface Env {
-  N8N_WEBHOOK_URL: string;       // dein n8n-Webhook
-  CLIENT_AUTH_KV: KVNamespace;   // KV-Binding mit client_id -> api_key (+ Rate-Limiter)
+  N8N_WEBHOOK_URL: string;       // dein n8n-Webhook (ENV in Cloudflare Pages)
+  CLIENT_AUTH_KV: KVNamespace;   // KV-Binding mit client_id -> { api_key }
 }
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
-  const url = new URL(ctx.request.url);
+  const req = ctx.request;
+  const url = new URL(req.url);
+
+  // 0) Origin-Check (nur deine Domains)
+  const origin =
+    req.headers.get('origin') ||
+    req.headers.get('referer') ||
+    '';
+
+  const allowedOrigins = [
+    'https://pages.endora.io',
+    'https://cloud.endora.io',
+    'https://endora.pages.dev',
+    'https://pages-endora.pages.dev',
+  ];
+
+  if (origin && !allowedOrigins.some(o => origin.startsWith(o))) {
+    return new Response(
+      JSON.stringify({ error: 'Forbidden origin' }),
+      {
+        status: 403,
+        headers: { 'content-type': 'application/json' },
+      },
+    );
+  }
 
   // 1) client_id aus Query oder Header holen
   const clientId =
     url.searchParams.get('client') ||
-    ctx.request.headers.get('x-client-id') ||
+    req.headers.get('x-client-id') ||
     '';
 
   if (!clientId) {
@@ -37,38 +61,41 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   const apiKey = (kvEntry as { api_key: string }).api_key;
 
-  // 3) Rate-Limiting pro client_id (KV-basiert)
+  // 3) Rate-Limiter pro client (einfach, aber effektiv)
   const rlKey = `rate:${clientId}`;
   const now = Date.now();
-  const WINDOW_MS = 60_000;   // 60 Sekunden
-  const LIMIT = 60;           // 60 Requests pro Minute
+  const windowMs = 60_000; // 1 Minute
+  const maxPerWindow = 60; // 60 Requests / Minute / Client
 
-  type RateEntry = { count: number; reset: number };
+  const rlRaw = await ctx.env.CLIENT_AUTH_KV.get(rlKey, { type: 'json' }) as
+    | { count: number; windowStart: number }
+    | null;
 
-  let rl: RateEntry | null = null;
-  const rlRaw = await ctx.env.CLIENT_AUTH_KV.get(rlKey, { type: 'json' }) as RateEntry | null;
+  let count = 1;
+  let windowStart = now;
 
-  if (rlRaw && typeof rlRaw.count === 'number' && typeof rlRaw.reset === 'number') {
-    rl = rlRaw;
-  } else {
-    rl = { count: 0, reset: now + WINDOW_MS };
+  if (rlRaw && typeof rlRaw === 'object') {
+    const diff = now - rlRaw.windowStart;
+    if (diff < windowMs) {
+      // noch im gleichen Fenster
+      count = rlRaw.count + 1;
+      windowStart = rlRaw.windowStart;
+    } else {
+      // neues Zeitfenster
+      count = 1;
+      windowStart = now;
+    }
   }
 
-  // Fenster abgelaufen? -> neu starten
-  if (rl.reset < now) {
-    rl = { count: 0, reset: now + WINDOW_MS };
-  }
+  await ctx.env.CLIENT_AUTH_KV.put(
+    rlKey,
+    JSON.stringify({ count, windowStart }),
+    { expirationTtl: 120 }, // 2 Minuten TTL reicht
+  );
 
-  // Limit erreicht?
-  if (rl.count >= LIMIT) {
+  if (count > maxPerWindow) {
     return new Response(
-      JSON.stringify({
-        error: 'Too many requests',
-        client_id: clientId,
-        limit: LIMIT,
-        window_ms: WINDOW_MS,
-        retry_at: rl.reset,
-      }),
+      JSON.stringify({ error: 'Rate limit exceeded' }),
       {
         status: 429,
         headers: { 'content-type': 'application/json' },
@@ -76,21 +103,15 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     );
   }
 
-  // Zähler erhöhen & zurück in KV schreiben (mit TTL bis zum Fensterende)
-  rl.count += 1;
-  await ctx.env.CLIENT_AUTH_KV.put(rlKey, JSON.stringify(rl), {
-    expiration: Math.floor(rl.reset / 1000), // TTL = Ende des Fensters
-  });
-
   // 4) Request-Body 1:1 übernehmen
-  const body = await ctx.request.arrayBuffer();
+  const body = await req.arrayBuffer();
 
   // 5) an n8n-Webhook weiterleiten
   const res = await fetch(ctx.env.N8N_WEBHOOK_URL, {
     method: 'POST',
     headers: {
       'content-type':
-        ctx.request.headers.get('content-type') || 'application/json',
+        req.headers.get('content-type') || 'application/json',
       'authorization': `Bearer ${apiKey}`,
       'x-client-id': clientId,
     },
@@ -102,4 +123,4 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     status: res.status,
     headers: res.headers,
   });
-};
+};^
