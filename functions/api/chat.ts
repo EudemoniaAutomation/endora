@@ -1,28 +1,45 @@
 export interface Env {
-  N8N_WEBHOOK_URL: string;       // dein n8n-Webhook (ENV in Cloudflare Pages)
-  CLIENT_AUTH_KV: KVNamespace;   // KV-Binding mit client_id -> { api_key }
+  N8N_WEBHOOK_URL: string;        // Secret in Cloudflare Pages
+  CLIENT_AUTH_KV: KVNamespace;    // KV-Binding: key = client_api_id, value = { api_key }
+}
+
+// einfache Origin-Whitelist (kannst du bei Bedarf erweitern)
+const ALLOWED_ORIGINS = new Set<string>([
+  'https://pages.endora.io',
+  'https://cloud.endora.io',
+]);
+
+// Rate-Limiter-Konfiguration
+const RATE_LIMIT_WINDOW_SECONDS = 60; // Zeitfenster
+const RATE_LIMIT_MAX_REQUESTS = 60;   // max. Requests pro Client im Zeitfenster
+
+async function isRateLimited(env: Env, clientApiId: string): Promise<boolean> {
+  const key = `rate:${clientApiId}`;
+
+  const currentStr = await env.CLIENT_AUTH_KV.get(key);
+  const current = currentStr ? parseInt(currentStr, 10) || 0 : 0;
+
+  if (current >= RATE_LIMIT_MAX_REQUESTS) {
+    return true;
+  }
+
+  // Counter + TTL setzen
+  await env.CLIENT_AUTH_KV.put(key, String(current + 1), {
+    expirationTtl: RATE_LIMIT_WINDOW_SECONDS,
+  });
+
+  return false;
 }
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
-  const req = ctx.request;
-  const url = new URL(req.url);
+  const { request, env } = ctx;
+  const url = new URL(request.url);
 
-  // 0) Origin-Check (nur deine Domains)
-  const origin =
-    req.headers.get('origin') ||
-    req.headers.get('referer') ||
-    '';
-
-  const allowedOrigins = [
-    'https://pages.endora.io',
-    'https://cloud.endora.io',
-    'https://endora.pages.dev',
-    'https://pages-endora.pages.dev',
-  ];
-
-  if (origin && !allowedOrigins.some(o => origin.startsWith(o))) {
+  // 1) Origin check (optional, aber empfohlen)
+  const origin = request.headers.get('origin') || '';
+  if (origin && !ALLOWED_ORIGINS.has(origin)) {
     return new Response(
-      JSON.stringify({ error: 'Forbidden origin' }),
+      JSON.stringify({ error: 'Origin not allowed' }),
       {
         status: 403,
         headers: { 'content-type': 'application/json' },
@@ -30,15 +47,15 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     );
   }
 
-  // 1) client_id aus Query oder Header holen
-  const clientId =
+  // 2) client_api_id aus Query oder Header holen
+  const clientApiId =
     url.searchParams.get('client') ||
-    req.headers.get('x-client-id') ||
+    request.headers.get('x-client-id') ||
     '';
 
-  if (!clientId) {
+  if (!clientApiId) {
     return new Response(
-      JSON.stringify({ error: 'Missing client_id' }),
+      JSON.stringify({ error: 'Missing client identifier' }),
       {
         status: 400,
         headers: { 'content-type': 'application/json' },
@@ -46,8 +63,19 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     );
   }
 
-  // 2) api_key aus KV holen
-  const kvEntry = await ctx.env.CLIENT_AUTH_KV.get(clientId, { type: 'json' });
+  // 3) Rate-Limiter
+  if (await isRateLimited(env, clientApiId)) {
+    return new Response(
+      JSON.stringify({ error: 'Rate limit exceeded' }),
+      {
+        status: 429,
+        headers: { 'content-type': 'application/json' },
+      },
+    );
+  }
+
+  // 4) api_key aus KV holen
+  const kvEntry = await env.CLIENT_AUTH_KV.get(clientApiId, { type: 'json' });
 
   if (!kvEntry || typeof kvEntry !== 'object' || !('api_key' in kvEntry)) {
     return new Response(
@@ -61,66 +89,21 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   const apiKey = (kvEntry as { api_key: string }).api_key;
 
-  // 3) Rate-Limiter pro client (einfach, aber effektiv)
-  const rlKey = `rate:${clientId}`;
-  const now = Date.now();
-  const windowMs = 60_000; // 1 Minute
-  const maxPerWindow = 60; // 60 Requests / Minute / Client
+  // 5) Request-Body 1:1 übernehmen
+  const body = await request.arrayBuffer();
 
-  const rlRaw = await ctx.env.CLIENT_AUTH_KV.get(rlKey, { type: 'json' }) as
-    | { count: number; windowStart: number }
-    | null;
-
-  let count = 1;
-  let windowStart = now;
-
-  if (rlRaw && typeof rlRaw === 'object') {
-    const diff = now - rlRaw.windowStart;
-    if (diff < windowMs) {
-      // noch im gleichen Fenster
-      count = rlRaw.count + 1;
-      windowStart = rlRaw.windowStart;
-    } else {
-      // neues Zeitfenster
-      count = 1;
-      windowStart = now;
-    }
-  }
-
-  await ctx.env.CLIENT_AUTH_KV.put(
-    rlKey,
-    JSON.stringify({ count, windowStart }),
-    { expirationTtl: 120 }, // 2 Minuten TTL reicht
-  );
-
-  if (count > maxPerWindow) {
-    return new Response(
-      JSON.stringify({ error: 'Rate limit exceeded' }),
-      {
-        status: 429,
-        headers: { 'content-type': 'application/json' },
-      },
-    );
-  }
-
-  // 4) Request-Body 1:1 übernehmen
-  const body = await req.arrayBuffer();
-
-  // 5) an n8n-Webhook weiterleiten
-  const res = await fetch(ctx.env.N8N_WEBHOOK_URL, {
+  // 6) an n8n-Webhook weiterleiten
+  const res = await fetch(env.N8N_WEBHOOK_URL, {
     method: 'POST',
     headers: {
       'content-type':
-        req.headers.get('content-type') || 'application/json',
+        request.headers.get('content-type') || 'application/json',
       'authorization': `Bearer ${apiKey}`,
-      'x-client-id': clientId,
+      'x-client-id': clientApiId,       // geht mit zu n8n
     },
     body,
   });
 
-  // 6) Antwort von n8n durchreichen
-  return new Response(res.body, {
-    status: res.status,
-    headers: res.headers,
-  });
-};^
+  // 7) Antwort von n8n einfach durchreichen
+  return res;
+};
