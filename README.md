@@ -1,5 +1,3 @@
-Hier eine erste Version, die du direkt ins Repo legen kannst – z. B. clients/README.md.
-Du gibst deinen Kunden dann nur ihre persönliche CLIENT_API_ID und (optional) einen eigenen Farbsatz / Branding.
 
 # Endora Guest Chat – Einbettung
 
