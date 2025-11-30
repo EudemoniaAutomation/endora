@@ -26,7 +26,6 @@ Du änderst **immer nur** die `client_api_id`. Der Endpoint selbst bleibt gleich
 
 Am einfachsten ist es, die von Endora gehostete Seite zu verwenden, z. B.:
 
-```text
 https://pages.endora.io/clients/yellow/
 
 Was du tun kannst:
