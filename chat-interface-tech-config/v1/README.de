@@ -1,0 +1,15 @@
+✅ 2. coreloader.js ist nun richtig abgelegt
+
+Du hast ihn korrekt hier gespeichert:
+
+pages.endora / chat-interface-tech-config / v1 / coreloader.js
+
+Das ist perfekt, denn:
+
+✔ Jede Client-Page lädt den Loader aus diesem Ordner
+
+✔ Loader bleibt global & unverändert für alle Kunden
+
+✔ Kunden müssen nur client_api_id setzen
+
+Genau so soll es sein.
