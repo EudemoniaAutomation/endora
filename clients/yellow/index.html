@@ -12,11 +12,10 @@
       display:flex;align-items:center;justify-content:center;padding:20px
     }
 
-    /* ==== Farb-Update: GELB ==== */
     :root{
       --bg:#000000;--ink:#ffffff;--muted:#94a3b8;
-      --acc:#ffd700;          /* Akzent: Gelb */
-      --acc-glow:#ffeb3b;     /* Glow: helleres Gelb */
+      --acc:#ffd700;
+      --acc-glow:#ffeb3b;
       --card:rgba(15,15,15,.8);
       --card-border:rgba(255,215,0,.15);
       --qr_size:160px;--bubble_size:56px
@@ -166,7 +165,10 @@
     .qr-container:hover{transform:scale(1.03)}
     .qr-container img{
       width:100%;height:100%;object-fit:contain;
-      image-rendering:pixelated;image-rendering:crisp-edges
+      image-rendering:pixelated;image-rendering:crisp-edges;
+      border-radius:12px;
+      border:1px solid #ddd;
+      background:#fff;
     }
 
     .chat-bubble{
@@ -287,31 +289,31 @@
         <input
           type="text"
           class="chat-input"
-          id="popup-input"
-          placeholder="Ask about check-in, amenities..."
+          id="popup-input" placeholder="Ask about check-in, amenities..."
         />
         <button class="chat-send" id="popup-send">Send</button>
       </div>
     </div>
   </div>
 
-  <!-- QRious für QR-Code -->
+  <!-- QRious für lokalen QR-Render -->
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
   <!-- TECH: Client-ID, Cloudflare-Endpoint, Loader + QR-Setup -->
   <script>
-    // 1) Fester Client-Identifier für diese Seite
+    // Fester Client-Identifier für diese Seite
     const CLIENT_API_ID = 'test_client_p';
 
-    // 2) Cloudflare-Chat-Endpoint (Pages Function)
+    // Cloudflare-Chat-Endpoint (Pages Function)
     const CHAT_ENDPOINT = `https://pages.endora.io/api/chat?client=${encodeURIComponent(CLIENT_API_ID)}`;
 
     (function(){
+      console.log('[Endora] Initializing yellow client page…');
+
       // --- Loader für Endora-Core-Script ---
       var s = document.createElement('script');
       s.src = '/chat-interface-tech-config/v1/coreloader.js';
 
-      // Auth / Routing Infos für den Loader
       s.setAttribute('data-webhook', CHAT_ENDPOINT);
       s.setAttribute('data-client-id', CLIENT_API_ID);
       s.setAttribute('data-brand', 'Endora');
@@ -327,31 +329,46 @@
         s.setAttribute('data-page-url', raw.split('#')[0].split('?')[0]);
       }
 
-      // Start-Verhalten
       s.setAttribute('data-start-open', 'false');
-
       document.body.appendChild(s);
 
-      // --- QR-Code erzeugen ---
+      // --- QR-Code erzeugen (mit Fallback) ---
       try {
-        var qrCanvas = document.createElement('canvas');
-        var qr = new QRious({
-          element: qrCanvas,
-          value: CHAT_ENDPOINT,
-          size: 180
-        });
-
         var img = document.getElementById('apt-qr-img');
-        if (img) {
-          img.src = qrCanvas.toDataURL('image/png');
-        }
-
         var link = document.getElementById('apt-qr');
+
         if (link) {
           link.href = CHAT_ENDPOINT;
         }
+
+        if (!img) {
+          console.warn('[Endora] apt-qr-img not found, cannot render QR.');
+          return;
+        }
+
+        if (window.QRious) {
+          console.log('[Endora] QRious gefunden, generiere lokalen QR-Code…');
+          var qrCanvas = document.createElement('canvas');
+          new QRious({
+            element: qrCanvas,
+            value: CHAT_ENDPOINT,
+            size: 180
+          });
+          img.src = qrCanvas.toDataURL('image/png');
+        } else {
+          console.warn('[Endora] QRious nicht verfügbar, nutze Fallback-QR-Service.');
+          img.src =
+            'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' +
+            encodeURIComponent(CHAT_ENDPOINT);
+        }
       } catch (err) {
-        console.error('QR generation failed:', err);
+        console.error('[Endora] QR generation failed, fallback:', err);
+        var imgFallback = document.getElementById('apt-qr-img');
+        if (imgFallback) {
+          imgFallback.src =
+            'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' +
+            encodeURIComponent(CHAT_ENDPOINT);
+        }
       }
     })();
   </script>
