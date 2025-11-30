@@ -37,7 +37,7 @@ Kein technischer Aufwand, die Seite wird von Endora gepflegt.
 
 ⸻
 
-3. Variante B – Einbettung per <iframe> auf deiner Website
+## 3. Variante B – Einbettung per <iframe> auf deiner Website
 
 Wenn du bereits eine eigene Website hast, kannst du Endora einfach im Inhalt einbetten:
 
@@ -52,7 +52,7 @@ Optional: Du kannst das style-Attribut an dein Layout anpassen (Höhe, Breite et
 
 ⸻
 
-4. Variante C – Direkte Einbettung des Chats (Advanced)
+## 4. Variante C – Direkte Einbettung des Chats (Advanced)
 
 Wenn du den Chat direkt in dein eigenes Design integrieren möchtest, kannst du den folgenden Code verwenden.
 
@@ -93,7 +93,7 @@ Der Loader:
 
 ⸻
 
-5. Was du von Endora bekommst
+## 5. Was du von Endora bekommst
 
 Von Endora erhältst du:
 	1.	deine client_api_id (z. B. villa_sunrise_01),
@@ -102,12 +102,12 @@ Von Endora erhältst du:
 
 ⸻
 
-6. Support
+## 6. Support
 
 Wenn du Hilfe bei der Einbindung brauchst oder eine eigene Farbwelt / eigenes Branding für deinen Endora-Chat möchtest, melde dich einfach bei uns.
 
 Wenn du jetzt als Nächstes magst, können wir:
 
 - den aktuellen `coreloader.js` gemeinsam einmal „aufräumen“ (Kommentare, Option für `data-client-id`, Fallbacks),  
-- oder direkt eine Kunden-Variante (Minimal-Loader) daraus ableiten, die du als „Standard-Snippet“ verteilen kannst.
+- oder direkt eine Kunden-Variante (Minimal-Loader) daraus ableiten, die du als „Standard-Snippet“ verteilen kannst. 
 
